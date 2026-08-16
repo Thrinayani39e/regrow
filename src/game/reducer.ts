@@ -7,6 +7,7 @@ export type Action =
   | { type: 'FEWER_WEEKS' }
   | { type: 'MORE_WEEKS' }
   | { type: 'BEGIN' }
+  | { type: 'EDIT_SETUP' }
   | { type: 'SET_DRAFT'; value: string }
   | { type: 'ADD_OWN'; id: string; name: string }
   | { type: 'REMOVE_CUSTOM'; id: string }
@@ -41,7 +42,12 @@ export function gameReducer(state: GameState, action: Action): GameState {
     case 'MORE_WEEKS':
       return { ...state, weeks: Math.min(16, state.weeks + 1) };
     case 'BEGIN':
-      return { ...state, screen: 'farm' };
+      return { ...state, screen: 'farm', started: true };
+    // Revisit the setup screen without resetting anything else — target,
+    // weeks, level and plot are all still just fields on this same state,
+    // so navigating back to 'start' and back to 'farm' again is enough.
+    case 'EDIT_SETUP':
+      return { ...state, screen: 'start' };
     case 'SET_DRAFT':
       return { ...state, draft: action.value };
     case 'ADD_OWN':

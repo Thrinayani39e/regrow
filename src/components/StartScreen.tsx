@@ -16,9 +16,16 @@ export function StartScreen({ state, dispatch }: StartScreenProps) {
     h: 6 + Math.round((i / Math.max(1, state.weeks - 1)) * 18),
   }));
 
+  const editing = state.started;
+
   return (
-    <Card title="NEW FARM" subtitle="FILE 1 — EMPTY">
+    <Card title={editing ? 'EDIT YOUR FARM' : 'NEW FARM'} subtitle={editing ? `WEEK ${state.week} OF ${state.weeks}` : 'FILE 1 — EMPTY'}>
       <div style={{ padding: '22px 24px 26px', display: 'flex', flexDirection: 'column', gap: 22 }}>
+        {editing && (
+          <div style={{ fontSize: 15, color: palette.inkMuted }}>
+            change anything below, then head back — nothing here resets your week or your plot.
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ fontSize: 21 }}>when you're all the way back, what does a full week look like?</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 10 }}>
@@ -143,7 +150,7 @@ export function StartScreen({ state, dispatch }: StartScreenProps) {
           padding="14px 26px"
           style={{ alignSelf: 'flex-start', boxShadow: `0 5px 0 0 ${palette.cardBorder}` }}
         >
-          BREAK GROUND
+          {editing ? 'BACK TO THE FARM' : 'BREAK GROUND'}
         </PixelButton>
       </div>
     </Card>

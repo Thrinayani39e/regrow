@@ -35,6 +35,10 @@ export interface GameState {
   journal: JournalEntry[];
   journalStamp: StampKey | null;
   journalNote: string;
+  // True once BREAK GROUND has ever been pressed — distinguishes "first
+  // time setup" from "revisiting setup to tweak something," which changes
+  // the start screen's copy and button label but not its behavior.
+  started: boolean;
 }
 
 export const initialState: GameState = {
@@ -57,6 +61,7 @@ export const initialState: GameState = {
   journal: [],
   journalStamp: null,
   journalNote: '',
+  started: false,
 };
 
 export interface Target {

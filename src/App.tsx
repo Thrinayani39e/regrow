@@ -13,7 +13,8 @@ import { DayEndScreen } from './components/DayEndScreen';
 import { WorldFrame } from './components/WorldFrame';
 import { LiveRegion } from './components/LiveRegion';
 import { MoodMusicBoard } from './components/MoodMusicBoard';
-import { pixelDisplayFont, pixelFont } from './components/ui';
+import { JournalBoard } from './components/JournalBoard';
+import { PixelButton, pixelDisplayFont, pixelFont } from './components/ui';
 
 function App() {
   const [state, dispatch] = useReducer(gameReducer, undefined, loadState);
@@ -39,15 +40,18 @@ function App() {
   const weekBadge = `WEEK ${state.week} OF ${state.weeks}`;
   const loadBadge = isMobile ? `${pct}% OF FULL · ${hrs} HRS` : `${pct}% OF A FULL WEEK · ${hrs} HRS`;
   const weatherBadge = hard ? 'LIGHT RAIN OVER THE EAST BEDS' : dusk ? 'SUN GOING DOWN' : 'CLEAR, A LITTLE WIND';
-  const seasonLabel = state.screen === 'start' ? 'NO SAVE FILE' : `WEEK ${state.week} / ${state.weeks} · ${tg.short.toUpperCase()}`;
-  const footer =
-    state.screen === 'start'
-      ? 'A RAMP-UP PLAN THAT LOOKS LIKE A FARM · TAP ANYWHERE ON THE PLOT TO WATER'
-      : 'TAP THE PLOT TO WATER · NOTHING HERE CAN BE FAILED';
+  // Revisiting setup via EDIT SETUP also lands on screen === 'start', so
+  // "fresh, no save yet" copy needs to check started too, not just screen.
+  const freshStart = state.screen === 'start' && !state.started;
+  const seasonLabel = freshStart ? 'NO SAVE FILE' : `WEEK ${state.week} / ${state.weeks} · ${tg.short.toUpperCase()}`;
+  const footer = freshStart
+    ? 'A RAMP-UP PLAN THAT LOOKS LIKE A FARM · TAP ANYWHERE ON THE PLOT TO WATER'
+    : 'TAP THE PLOT TO WATER · NOTHING HERE CAN BE FAILED';
 
-  const liveText =
-    state.screen === 'start'
-      ? 'Setting up a new farm. No save file yet.'
+  const liveText = freshStart
+    ? 'Setting up a new farm. No save file yet.'
+    : state.screen === 'start'
+      ? `Editing farm setup. Week ${state.week} of ${state.weeks}, ${tg.n}.`
       : `Week ${state.week} of ${state.weeks}. Carrying about ${pct}% of ${tg.n}, around ${hrs} hours. ${state.tended.length} of ${chores.length} chores tended today.`;
 
   const onPlotActivate = (_index: number) => {
@@ -88,12 +92,32 @@ function App() {
           </span>
           {!isMobile && <span style={{ fontSize: 15, color: palette.headerSubtitle, whiteSpace: 'nowrap' }}>tend your way back</span>}
         </div>
-        <span style={{ fontFamily: pixelDisplayFont, fontSize: isMobile ? 9 : 11, color: '#7c6c8c', textAlign: 'right', whiteSpace: 'nowrap' }}>{seasonLabel}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontFamily: pixelDisplayFont, fontSize: isMobile ? 9 : 11, color: '#7c6c8c', textAlign: 'right', whiteSpace: 'nowrap' }}>{seasonLabel}</span>
+          {state.screen !== 'start' && (
+            <PixelButton
+              onClick={() => dispatch({ type: 'EDIT_SETUP' })}
+              bg="rgba(45,28,16,.55)"
+              color="#e8d3ae"
+              fontSize={isMobile ? 9 : 10}
+              padding={isMobile ? '6px 8px' : '7px 10px'}
+              style={{ boxShadow: 'none', border: `2px solid ${palette.cardRing}` }}
+            >
+              EDIT SETUP
+            </PixelButton>
+          )}
+        </div>
       </div>
 
-      <div style={{ width: '100%', maxWidth: 880, marginBottom: 18 }}>
+      <div style={{ width: '100%', maxWidth: 880, marginBottom: 12 }}>
         <MoodMusicBoard />
       </div>
+
+      {state.screen !== 'start' && (
+        <div style={{ width: '100%', maxWidth: 880, marginBottom: 18 }}>
+          <JournalBoard state={state} dispatch={dispatch} />
+        </div>
+      )}
 
       <div style={{ width: '100%', maxWidth: 880 }}>
         {state.screen === 'start' ? (
