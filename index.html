@@ -3,9 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover lets env(safe-area-inset-*) report real values on
+         notched devices; pinch-zoom is left enabled (no user-scalable=no) —
+         double-tap-zoom and the 300ms tap delay are handled via touch-action
+         in CSS instead, which doesn't cost any zoom accessibility. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Regrow — tend your way back</title>
     <meta name="description" content="A gentle, phased return to your normal responsibilities, styled as a farm that grows back with you." />
+    <meta name="theme-color" content="#191521" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Regrow" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

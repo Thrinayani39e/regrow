@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { hapticTap } from '../haptics';
 import type { Theme } from '../game/types';
 import {
   DESKTOP_GRID,
@@ -94,6 +95,7 @@ export function FarmCanvas({
   const activatePlot = (index: number, x: number, y: number) => {
     if (!reducedMotion) splash(sceneRef.current, x, y);
     sceneRef.current.wetSet.add(index);
+    hapticTap();
     onPlotActivate(index);
   };
 
@@ -106,6 +108,7 @@ export function FarmCanvas({
     const row = Math.floor((y - grid.oy) / grid.chh);
     if (col >= 0 && col < grid.cols && row >= 0 && row < grid.rows) {
       sceneRef.current.wetSet.add(row * grid.cols + col);
+      hapticTap();
       onPlotActivate(row * grid.cols + col);
     }
   };

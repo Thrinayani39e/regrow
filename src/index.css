@@ -1,7 +1,28 @@
 html, body {
   margin: 0;
-  padding: 0;
   background: #191521;
+  /* Stops pull-to-refresh and the rubber-band bounce at the top/bottom of
+     the page — one of the fastest "this is just a website" tells if left
+     on. */
+  overscroll-behavior: none;
+}
+
+html {
+  /* Removes the ~300ms tap delay and double-tap-to-zoom, without touching
+     pinch-zoom (unlike viewport user-scalable=no, which disables zoom
+     entirely and is an accessibility regression). */
+  touch-action: manipulation;
+}
+
+body {
+  /* env() resolves to 0px on non-notched devices and in normal browser
+     tabs, so this is always safe to apply — it only does anything when
+     running standalone on a device with a notch/home-indicator (requires
+     viewport-fit=cover in index.html's viewport meta, already set). */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
 }
 
 #root {
@@ -10,6 +31,7 @@ html, body {
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {

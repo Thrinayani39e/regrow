@@ -1,0 +1,16 @@
+{
+  "name": "Regrow — tend your way back",
+  "short_name": "Regrow",
+  "description": "A gentle, phased return to your normal responsibilities, styled as a farm that grows back with you.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#191521",
+  "background_color": "#191521",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

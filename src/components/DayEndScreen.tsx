@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { TARGETS } from '../game/data';
 import { hoursFor, pctFor } from '../game/derived';
+import { hapticSettle } from '../haptics';
 import { palette } from '../game/palette';
 import type { Action } from '../game/reducer';
 import type { GameState } from '../game/types';
@@ -75,6 +76,7 @@ export function DayEndScreen({ state, dispatch, isMobile, totalBeds }: DayEndScr
         clearAdvanceTimeout();
         dispatch({ type: 'ADVANCE_WEEK' });
       }
+      hapticSettle();
       dispatch({ type: 'FINISH_TURN' });
       return;
     }

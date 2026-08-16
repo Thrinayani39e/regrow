@@ -1,5 +1,6 @@
 import { FEEL_OPTIONS } from '../game/data';
 import { feelCopy } from '../game/derived';
+import { hapticTap } from '../haptics';
 import { palette } from '../game/palette';
 import type { Action } from '../game/reducer';
 import type { Chore, GameState } from '../game/types';
@@ -38,6 +39,10 @@ export function TendScreen({ state, dispatch, chores, isMobile }: TendScreenProp
   const watering = state.taps < 3;
   const asking = state.taps >= 3 && !state.feel;
   const reply = state.feel ? feelCopy(state)[state.feel] : { r: '', s: '' };
+  const pour = () => {
+    hapticTap();
+    dispatch({ type: 'POUR' });
+  };
 
   if (watering) {
     const pourLine = isMobile
@@ -51,7 +56,7 @@ export function TendScreen({ state, dispatch, chores, isMobile }: TendScreenProp
           <div style={{ fontFamily: pixelDisplayFont, fontSize: 10, color: '#f0be7c' }}>{tendTitle}</div>
           <div style={{ fontSize: 20, lineHeight: 1.4, textAlign: 'center', color: '#f6e6c8' }}>{pourLine}</div>
           <PixelButton
-            onClick={() => dispatch({ type: 'POUR' })}
+            onClick={pour}
             bg={palette.btnWaterBg}
             fontSize={12}
             padding="12px 16px"
@@ -75,7 +80,7 @@ export function TendScreen({ state, dispatch, chores, isMobile }: TendScreenProp
         <div style={{ padding: '20px 22px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 22, flexWrap: 'wrap' }}>
             <PixelButton
-              onClick={() => dispatch({ type: 'POUR' })}
+              onClick={pour}
               bg={palette.btnWaterBg}
               fontSize={12}
               padding="12px 16px"
