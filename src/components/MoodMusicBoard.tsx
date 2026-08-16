@@ -204,7 +204,8 @@ export function MoodMusicBoard() {
                       href={`https://open.spotify.com/search/${encodeURIComponent(searchedFor)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ fontFamily: pixelDisplayFont, fontSize: 11, color: palette.btnWaterBg }}
+                      className="focus-ring"
+                      style={{ fontFamily: pixelDisplayFont, fontSize: 11, color: palette.linkOnCard, textDecoration: 'underline' }}
                     >
                       SEARCH "{searchedFor.toUpperCase()}" ON SPOTIFY ↗
                     </a>

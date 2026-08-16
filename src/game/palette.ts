@@ -27,6 +27,11 @@ export const palette = {
   tagText: '#684426',
   tagBorder: '#c9ac7c',
 
+  // Outbound links on the tan card (e.g. the Spotify search fallback).
+  // btnWaterBg (#c8874a) as text measured 1.97:1 there — too light to read
+  // as a link at all, let alone pass AA — darkened to clear 4.5:1.
+  linkOnCard: '#7a4a1a',
+
   headerTitle: '#f3d9a4',
   headerSubtitle: '#9b8ba8',
   // Footer strip on the dark page background. Original #6b5c7d measured
