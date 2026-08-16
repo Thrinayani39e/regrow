@@ -12,6 +12,7 @@ import { TendScreen } from './components/TendScreen';
 import { DayEndScreen } from './components/DayEndScreen';
 import { WorldFrame } from './components/WorldFrame';
 import { LiveRegion } from './components/LiveRegion';
+import { MoodMusicBoard } from './components/MoodMusicBoard';
 import { pixelDisplayFont, pixelFont } from './components/ui';
 
 function App() {
@@ -88,6 +89,10 @@ function App() {
           {!isMobile && <span style={{ fontSize: 15, color: palette.headerSubtitle, whiteSpace: 'nowrap' }}>tend your way back</span>}
         </div>
         <span style={{ fontFamily: pixelDisplayFont, fontSize: isMobile ? 9 : 11, color: '#7c6c8c', textAlign: 'right', whiteSpace: 'nowrap' }}>{seasonLabel}</span>
+      </div>
+
+      <div style={{ width: '100%', maxWidth: 880, marginBottom: 18 }}>
+        <MoodMusicBoard />
       </div>
 
       <div style={{ width: '100%', maxWidth: 880 }}>
