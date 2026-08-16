@@ -42,6 +42,24 @@ export function splash(scene: SceneState, x: number, y: number, col?: string): v
   }
 }
 
+// The moment a plot is watered for the first time — distinct from splash
+// (blue, falls) with a stronger upward drift and a green/gold palette, so
+// watering reads as "something just happened here" rather than only a
+// water-drop animation with no visible payoff.
+export function growPop(scene: SceneState, x: number, y: number): void {
+  const colors = ['rgba(150,220,140,.95)', 'rgba(226,196,120,.9)', 'rgba(180,235,160,.85)'];
+  for (let i = 0; i < 10; i++) {
+    scene.fx.push({
+      x,
+      y,
+      vx: (Math.random() - 0.5) * 1.2,
+      vy: -0.7 - Math.random() * 1.3,
+      life: 26 + Math.random() * 18,
+      c: colors[i % colors.length],
+    });
+  }
+}
+
 // Ported from Component.disc (line 307).
 export function disc(g: CanvasRenderingContext2D, cx: number, cy: number, r: number, col: string): void {
   g.fillStyle = col;
@@ -207,8 +225,14 @@ export function drawDesktop(p: DrawParams): void {
       g.fillRect(x, y, 30, 14);
       g.fillStyle = lerpC(wet ? '#5f3c25' : th.soil, '#4a3c4e', d * 0.6);
       g.fillRect(x + 1, y + 1, 28, 12);
-      const stage = plotStage(i, scene.growT, 20, 0.85);
-      const wilt = hard && (i === 4 || i === 11);
+      // Watering a plot nudges its own growth stage up by one (capped at
+      // full bloom) on top of whatever the season's overall pace already
+      // put it at — a fresh week-1 plot only reaches "a sprout appeared,"
+      // an already-nearly-ripe plot gets pushed the rest of the way. Never
+      // enough on its own to fully grow a plot the season hasn't earned.
+      const baseStage = plotStage(i, scene.growT, 20, 0.85);
+      const stage = wet ? Math.min(4, baseStage + 1) : baseStage;
+      const wilt = hard && (i === 4 || i === 11) && !wet;
       const sway = Math.round(Math.sin(t / 620 + i * 0.8) * 1);
       const cx = x + 15 + sway;
       const base = y + 12;
@@ -437,8 +461,9 @@ export function drawMobile(p: MobileDrawParams): void {
         g.fillRect(x, y, 2, 22);
         g.fillRect(x + 48, y, 2, 22);
       }
-      const stage = plotStage(i, scene.growT, 14, 0.9);
-      const wilt = hard && (i === 2 || i === 7);
+      const baseStage = plotStage(i, scene.growT, 14, 0.9);
+      const stage = wet ? Math.min(4, baseStage + 1) : baseStage;
+      const wilt = hard && (i === 2 || i === 7) && !wet;
       const sway = Math.round(Math.sin(t / 620 + i * 0.8) * 1);
       const cx = x + 25 + sway;
       const base = y + 19;

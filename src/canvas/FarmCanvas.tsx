@@ -7,6 +7,7 @@ import {
   createSceneState,
   drawDesktop,
   drawMobile,
+  growPop,
   splash,
   type Companion,
 } from './draw';
@@ -21,6 +22,10 @@ interface FarmCanvasProps {
   companion: Companion;
   reducedMotion: boolean;
   onPlotActivate: (index: number) => void;
+  // Which plots have been watered resets when the week turns (same moment
+  // `tended` resets in the reducer) — tending is a weekly rhythm, not a
+  // one-time unlock.
+  week: number;
 }
 
 // Ported from Component.setCanvas + draw() + onCanvasClick, re-hosted as a
@@ -38,10 +43,15 @@ export function FarmCanvas({
   companion,
   reducedMotion,
   onPlotActivate,
+  week,
 }: FarmCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef(createSceneState());
   const grid = isMobile ? MOBILE_GRID : DESKTOP_GRID;
+
+  useEffect(() => {
+    sceneRef.current.wetSet.clear();
+  }, [week]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -94,7 +104,9 @@ export function FarmCanvas({
 
   const activatePlot = (index: number, x: number, y: number) => {
     if (!reducedMotion) splash(sceneRef.current, x, y);
+    const wasDry = !sceneRef.current.wetSet.has(index);
     sceneRef.current.wetSet.add(index);
+    if (wasDry && !reducedMotion) growPop(sceneRef.current, x, y);
     hapticTap();
     onPlotActivate(index);
   };
@@ -107,9 +119,12 @@ export function FarmCanvas({
     const col = Math.floor((x - grid.ox) / grid.cw);
     const row = Math.floor((y - grid.oy) / grid.chh);
     if (col >= 0 && col < grid.cols && row >= 0 && row < grid.rows) {
-      sceneRef.current.wetSet.add(row * grid.cols + col);
+      const index = row * grid.cols + col;
+      const wasDry = !sceneRef.current.wetSet.has(index);
+      sceneRef.current.wetSet.add(index);
+      if (wasDry && !reducedMotion) growPop(sceneRef.current, x, y);
       hapticTap();
-      onPlotActivate(row * grid.cols + col);
+      onPlotActivate(index);
     }
   };
 
