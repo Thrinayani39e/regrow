@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { palette } from '../game/palette';
+import { CRISIS_MESSAGE, detectsCrisisLanguage } from '../game/safety';
 import { Card, PixelButton, pixelDisplayFont, pixelFont } from './ui';
 
 interface Mood {
@@ -79,6 +80,7 @@ export function MoodMusicBoard() {
   const [moodKey, setMoodKey] = useState<string | null>(null);
   const [searchedFor, setSearchedFor] = useState<string | null>(null);
   const [noMatch, setNoMatch] = useState(false);
+  const [crisis, setCrisis] = useState(false);
 
   const mood = MOODS.find((m) => m.key === moodKey) ?? null;
 
@@ -86,20 +88,32 @@ export function MoodMusicBoard() {
     setMoodKey(m.key);
     setSearchedFor(null);
     setNoMatch(false);
+    setCrisis(false);
   };
 
   const runSearch = () => {
     const q = query.trim();
     if (!q) return;
+    // Checked before any mood matching — this isn't a "mood" the playlist
+    // library should try to serve music for, cheerfully or otherwise.
+    if (detectsCrisisLanguage(q)) {
+      setMoodKey(null);
+      setSearchedFor(q);
+      setNoMatch(false);
+      setCrisis(true);
+      return;
+    }
     const found = matchMood(q);
     if (found) {
       setMoodKey(found.key);
       setSearchedFor(q);
       setNoMatch(false);
+      setCrisis(false);
     } else {
       setMoodKey(null);
       setSearchedFor(q);
       setNoMatch(true);
+      setCrisis(false);
     }
   };
 
@@ -197,7 +211,22 @@ export function MoodMusicBoard() {
               </div>
 
               <div aria-live="polite">
-                {noMatch && searchedFor && (
+                {crisis && (
+                  <div
+                    style={{
+                      fontSize: 15,
+                      lineHeight: 1.5,
+                      color: palette.inkDark,
+                      background: palette.inputBg,
+                      border: `3px solid ${palette.cardBorder}`,
+                      padding: 14,
+                    }}
+                  >
+                    {CRISIS_MESSAGE}
+                  </div>
+                )}
+
+                {!crisis && noMatch && searchedFor && (
                   <div style={{ fontSize: 15, color: palette.inkMuted, display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <span>don't have a playlist tuned for "{searchedFor}" yet — but here's a direct line to Spotify's own search for it.</span>
                     <a
@@ -238,7 +267,7 @@ export function MoodMusicBoard() {
                   </div>
                 )}
 
-                {!mood && !noMatch && (
+                {!crisis && !mood && !noMatch && (
                   <div style={{ fontSize: 15, color: palette.inkMuted }}>
                     type anything, hit surprise me, or pick from the list — this doesn't have to match the plan.
                   </div>

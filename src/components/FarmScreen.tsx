@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { hardWeek } from '../game/derived';
 import { palette } from '../game/palette';
-import type { Action } from '../game/reducer';
+import { MAX_CHORE_NAME_LENGTH, MAX_CUSTOM_CHORES, type Action } from '../game/reducer';
 import type { Chore, GameState } from '../game/types';
+import { CRISIS_MESSAGE, detectsCrisisLanguage } from '../game/safety';
 import { ICONS } from '../canvas/sprites';
 import { ChoreRow } from './ChoreRow';
 import { Card, PixelButton, pixelFont, pixelDisplayFont } from './ui';
@@ -14,11 +16,22 @@ interface FarmScreenProps {
 }
 
 function DraftField({ state, dispatch, dense }: { state: GameState; dispatch: React.Dispatch<Action>; dense?: boolean }) {
+  const [crisis, setCrisis] = useState(false);
+  const atCap = state.custom.length >= MAX_CUSTOM_CHORES;
+
   const addOwn = () => {
     const name = state.draft.trim();
-    if (!name) return;
-    dispatch({ type: 'ADD_OWN', id: 'own' + Date.now(), name });
+    if (!name || atCap) return;
+    // Not blocking the entry — this field is theirs, not moderated — but
+    // the app's own reply shouldn't be a cheerful "added to your chores!"
+    // in the face of language like this, so that reply is swapped out for
+    // a resource note instead of (silently) staying quiet about it.
+    if (detectsCrisisLanguage(name)) {
+      setCrisis(true);
+    }
+    dispatch({ type: 'ADD_OWN', id: `own${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, name });
   };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: dense ? '0' : '16px 0 4px' }}>
       <div style={{ fontFamily: pixelDisplayFont, fontSize: dense ? 9 : 10, color: palette.tagText }}>
@@ -27,11 +40,22 @@ function DraftField({ state, dispatch, dense }: { state: GameState; dispatch: Re
       <div style={{ display: 'flex', gap: dense ? 8 : 10, flexWrap: 'wrap' }}>
         <input
           value={state.draft}
-          onChange={(e) => dispatch({ type: 'SET_DRAFT', value: e.target.value })}
+          onChange={(e) => {
+            setCrisis(false);
+            dispatch({ type: 'SET_DRAFT', value: e.target.value });
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') addOwn();
           }}
-          placeholder={dense ? 'a walk, guitar, sunday cooking' : 'something you actually want back — a walk, guitar, sunday cooking'}
+          maxLength={MAX_CHORE_NAME_LENGTH}
+          disabled={atCap}
+          placeholder={
+            atCap
+              ? 'that’s a full plot for now — pull one up to plant another'
+              : dense
+                ? 'a walk, guitar, sunday cooking'
+                : 'something you actually want back — a walk, guitar, sunday cooking'
+          }
           aria-label="Plant something of your own"
           style={{
             flex: '1 1 320px',
@@ -40,14 +64,15 @@ function DraftField({ state, dispatch, dense }: { state: GameState; dispatch: Re
             fontSize: dense ? 16 : 17,
             padding: dense ? '12px 10px' : '11px 12px',
             border: `3px solid ${palette.cardBorder}`,
-            background: palette.inputBg,
+            background: atCap ? palette.btnTendedBg : palette.inputBg,
             color: palette.inkDark,
             outline: 'none',
           }}
         />
         <PixelButton
           onClick={addOwn}
-          bg={state.draft.trim() ? palette.btnGreenBg : palette.btnTendedBg}
+          disabled={!state.draft.trim() || atCap}
+          bg={state.draft.trim() && !atCap ? palette.btnGreenBg : palette.btnTendedBg}
           fontSize={dense ? 10 : 11}
           padding={dense ? '0 14px' : '12px 18px'}
           minHeight={dense ? 44 : undefined}
@@ -55,11 +80,27 @@ function DraftField({ state, dispatch, dense }: { state: GameState; dispatch: Re
           {dense ? 'SOW' : 'SOW IT'}
         </PixelButton>
       </div>
-      <div style={{ fontSize: dense ? 14 : 15, lineHeight: 1.4, color: palette.inkMuted }}>
-        {state.custom.length
-          ? 'these get tended the same as the rest — and they count.'
-          : "a walk, sketching, calling someone back. recovery isn't only the load you owe."}
-      </div>
+      {crisis ? (
+        <div
+          role="status"
+          style={{
+            fontSize: dense ? 13 : 15,
+            lineHeight: 1.5,
+            color: palette.inkDark,
+            background: palette.inputBg,
+            border: `2px solid ${palette.cardBorder}`,
+            padding: 10,
+          }}
+        >
+          {CRISIS_MESSAGE}
+        </div>
+      ) : (
+        <div style={{ fontSize: dense ? 14 : 15, lineHeight: 1.4, color: palette.inkMuted }}>
+          {state.custom.length
+            ? 'these get tended the same as the rest — and they count.'
+            : "a walk, sketching, calling someone back. recovery isn't only the load you owe."}
+        </div>
+      )}
     </div>
   );
 }
