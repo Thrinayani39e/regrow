@@ -80,14 +80,14 @@ function App() {
     >
       <LiveRegion text={liveText} />
 
-      <div style={{ width: '100%', maxWidth: 880, display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-          <span style={{ fontFamily: pixelDisplayFont, fontSize: 22, letterSpacing: 1, color: palette.headerTitle, textShadow: '2px 2px 0 #4a2c18' }}>
+      <div style={{ width: '100%', maxWidth: 880, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, minWidth: 0 }}>
+          <span style={{ fontFamily: pixelDisplayFont, fontSize: isMobile ? 17 : 22, letterSpacing: 1, color: palette.headerTitle, textShadow: '2px 2px 0 #4a2c18', whiteSpace: 'nowrap' }}>
             REGROW
           </span>
-          <span style={{ fontSize: 15, color: palette.headerSubtitle }}>tend your way back</span>
+          {!isMobile && <span style={{ fontSize: 15, color: palette.headerSubtitle, whiteSpace: 'nowrap' }}>tend your way back</span>}
         </div>
-        <span style={{ fontFamily: pixelDisplayFont, fontSize: 11, color: '#7c6c8c' }}>{seasonLabel}</span>
+        <span style={{ fontFamily: pixelDisplayFont, fontSize: isMobile ? 9 : 11, color: '#7c6c8c', textAlign: 'right', whiteSpace: 'nowrap' }}>{seasonLabel}</span>
       </div>
 
       <div style={{ width: '100%', maxWidth: 880 }}>
