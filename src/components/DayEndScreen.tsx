@@ -3,7 +3,6 @@ import { hoursFor, pctFor } from '../game/derived';
 import { palette } from '../game/palette';
 import type { Action } from '../game/reducer';
 import type { GameState } from '../game/types';
-import { JournalCard, JournalScrapbook } from './JournalCard';
 import { Card, PixelButton, pixelDisplayFont } from './ui';
 
 interface DayEndScreenProps {
@@ -47,6 +46,8 @@ export function DayEndScreen({ state, dispatch, isMobile, totalBeds }: DayEndScr
     setTimeout(() => dispatch({ type: 'ADVANCE_WEEK' }), 900);
   };
 
+  const journalHint = 'want to leave a stamp or a line about this week? open JOURNAL, up by the header.';
+
   const tallyBox = (
     <div style={{ border: `3px solid ${palette.tagBorder}`, padding: isMobile ? 11 : 14, display: 'flex', flexDirection: 'column', gap: isMobile ? 5 : 8 }}>
       <div style={{ fontFamily: pixelDisplayFont, fontSize: isMobile ? 9 : 10, color: palette.tagText }}>THIS WEEK'S PLOT</div>
@@ -88,12 +89,11 @@ export function DayEndScreen({ state, dispatch, isMobile, totalBeds }: DayEndScr
           <div style={{ background: palette.barBg, borderBottom: `4px solid ${palette.cardBorder}`, padding: '8px 12px', fontFamily: pixelDisplayFont, fontSize: 10, color: palette.barTitle, flex: '0 0 auto' }}>
             {dayEndTitle}
           </div>
-          <div style={{ padding: '15px 14px 18px', display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', flex: '1 1 auto' }}>
+          <div style={{ padding: '15px 14px 18px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', flex: '1 1 auto' }}>
             <div style={{ fontSize: 23, lineHeight: 1.35 }}>{dayEndLine}</div>
             <div style={{ fontSize: 15, lineHeight: 1.45, color: palette.inkMuted }}>{dayEndSub}</div>
-            {!state.turning && <JournalCard state={state} dispatch={dispatch} isMobile />}
+            {!state.turning && <div style={{ fontSize: 13, color: palette.inkMuted }}>{journalHint}</div>}
             {tallyBox}
-            <JournalScrapbook journal={state.journal} isMobile />
             {buttons}
           </div>
         </div>
@@ -103,17 +103,14 @@ export function DayEndScreen({ state, dispatch, isMobile, totalBeds }: DayEndScr
 
   return (
     <Card title={dayEndTitle}>
-      <div style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <div style={{ flex: '1 1 380px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 26, lineHeight: 1.3 }}>{dayEndLine}</div>
-            <div style={{ fontSize: 17, color: palette.inkMuted, lineHeight: 1.5 }}>{dayEndSub}</div>
-            {!state.turning && <JournalCard state={state} dispatch={dispatch} isMobile={false} />}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', paddingTop: 4 }}>{buttons}</div>
-          </div>
-          <div style={{ flex: '0 1 260px' }}>{tallyBox}</div>
+      <div style={{ padding: 22, display: 'flex', gap: 22, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <div style={{ flex: '1 1 380px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 26, lineHeight: 1.3 }}>{dayEndLine}</div>
+          <div style={{ fontSize: 17, color: palette.inkMuted, lineHeight: 1.5 }}>{dayEndSub}</div>
+          {!state.turning && <div style={{ fontSize: 14, color: palette.inkMuted }}>{journalHint}</div>}
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', paddingTop: 4 }}>{buttons}</div>
         </div>
-        <JournalScrapbook journal={state.journal} isMobile={false} />
+        <div style={{ flex: '0 1 260px' }}>{tallyBox}</div>
       </div>
     </Card>
   );
