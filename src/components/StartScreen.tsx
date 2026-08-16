@@ -1,7 +1,7 @@
 import { LEVELS, TARGETS, THEMES } from '../game/data';
 import type { Action } from '../game/reducer';
 import { palette } from '../game/palette';
-import type { GameState } from '../game/types';
+import type { Companion, GameState } from '../game/types';
 import { THUMBS } from '../canvas/sprites';
 import { Card, PixelButton, pixelDisplayFont, pixelFont } from './ui';
 
@@ -9,6 +9,12 @@ interface StartScreenProps {
   state: GameState;
   dispatch: React.Dispatch<Action>;
 }
+
+const COMPANIONS: { key: Companion; label: string }[] = [
+  { key: 'cat', label: 'a cat' },
+  { key: 'chicken', label: 'a chicken' },
+  { key: 'none', label: 'just the farm' },
+];
 
 // Ported from the "isStart" block in Regrow.dc.html (lines 34-95).
 export function StartScreen({ state, dispatch }: StartScreenProps) {
@@ -139,6 +145,28 @@ export function StartScreen({ state, dispatch }: StartScreenProps) {
                 <span style={{ display: 'block', padding: '6px 10px' }}>{p.n}</span>
               </button>
             ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ fontSize: 21 }}>who's keeping you company?</div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {COMPANIONS.map((c) => (
+              <PixelButton
+                key={c.key}
+                onClick={() => dispatch({ type: 'SET_COMPANION', companion: c.key })}
+                bg={c.key === state.companion ? palette.btnAmberBg : palette.btnTanBg}
+                ariaPressed={c.key === state.companion}
+                fontFamily={pixelFont}
+                fontSize={16}
+                padding="10px 16px"
+              >
+                {c.label}
+              </PixelButton>
+            ))}
+          </div>
+          <div style={{ fontSize: 15, color: palette.inkMuted }}>
+            wanders the plot, sits when it's tired, comes over when you tap it. purely company — nothing about it depends on you.
           </div>
         </div>
 

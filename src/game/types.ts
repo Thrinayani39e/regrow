@@ -1,5 +1,6 @@
 export type Screen = 'start' | 'farm' | 'tend' | 'dayend';
 export type Feel = 'easy' | 'right' | 'much';
+export type Companion = 'cat' | 'chicken' | 'none';
 
 export interface CustomChore {
   id: string;
@@ -39,6 +40,7 @@ export interface GameState {
   // time setup" from "revisiting setup to tweak something," which changes
   // the start screen's copy and button label but not its behavior.
   started: boolean;
+  companion: Companion;
 }
 
 export const initialState: GameState = {
@@ -62,6 +64,7 @@ export const initialState: GameState = {
   journalStamp: null,
   journalNote: '',
   started: false,
+  companion: 'cat',
 };
 
 export interface Target {

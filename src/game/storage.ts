@@ -1,12 +1,13 @@
 import { TARGETS, THEMES } from './data';
 import { MAX_CHORE_NAME_LENGTH, MAX_CUSTOM_CHORES } from './reducer';
-import { initialState, type CustomChore, type Feel, type GameState, type JournalEntry, type Screen, type StampKey } from './types';
+import { initialState, type Companion, type CustomChore, type Feel, type GameState, type JournalEntry, type Screen, type StampKey } from './types';
 
 const STORAGE_KEY = 'regrow.save.v1';
 
 const SCREENS: Screen[] = ['start', 'farm', 'tend', 'dayend'];
 const FEELS: Feel[] = ['easy', 'right', 'much'];
 const STAMPS: StampKey[] = ['heart', 'star', 'cloud', 'moon', 'paw', 'mug'];
+const COMPANIONS: Companion[] = ['cat', 'chicken', 'none'];
 
 function isPartialGameState(value: unknown): value is Partial<GameState> {
   return !!value && typeof value === 'object' && 'screen' in value;
@@ -114,6 +115,7 @@ function sanitizeState(parsed: Partial<GameState>): GameState {
     journalStamp: asNullableEnum(parsed.journalStamp, STAMPS),
     journalNote: asString(parsed.journalNote, initialState.journalNote).slice(0, 140),
     started: asBool(parsed.started, false) || screen !== 'start',
+    companion: asEnum(parsed.companion, COMPANIONS, initialState.companion),
   };
 }
 

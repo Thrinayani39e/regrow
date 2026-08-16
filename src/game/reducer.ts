@@ -1,4 +1,4 @@
-import type { Feel, GameState, StampKey } from './types';
+import type { Companion, Feel, GameState, StampKey } from './types';
 
 export const MAX_CUSTOM_CHORES = 12;
 export const MAX_CHORE_NAME_LENGTH = 60;
@@ -7,6 +7,7 @@ export type Action =
   | { type: 'SET_TARGET'; index: number }
   | { type: 'SET_START_LEVEL'; value: number }
   | { type: 'SET_PLOT'; index: number }
+  | { type: 'SET_COMPANION'; companion: Companion }
   | { type: 'FEWER_WEEKS' }
   | { type: 'MORE_WEEKS' }
   | { type: 'BEGIN' }
@@ -40,6 +41,8 @@ export function gameReducer(state: GameState, action: Action): GameState {
       return { ...state, startLevel: action.value };
     case 'SET_PLOT':
       return { ...state, plot: action.index };
+    case 'SET_COMPANION':
+      return { ...state, companion: action.companion };
     case 'FEWER_WEEKS':
       return { ...state, weeks: Math.max(4, state.weeks - 1) };
     case 'MORE_WEEKS':

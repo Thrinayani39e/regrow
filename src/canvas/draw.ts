@@ -1,6 +1,6 @@
-import type { Theme } from '../game/types';
+import type { Companion, Theme } from '../game/types';
 
-export type Companion = 'cat' | 'chicken' | 'none';
+export type { Companion };
 
 export interface Particle {
   x: number;
@@ -22,10 +22,11 @@ export interface SceneState {
   walk: number;
   fx: Particle[];
   wetSet: Set<number>;
+  petHappyUntil: number;
 }
 
 export function createSceneState(): SceneState {
-  return { duskF: 0, growT: 0, walk: 0, fx: [], wetSet: new Set() };
+  return { duskF: 0, growT: 0, walk: 0, fx: [], wetSet: new Set(), petHappyUntil: 0 };
 }
 
 // Ported from Component.splash (Regrow.dc.html line 455-457).
@@ -59,6 +60,48 @@ export function growPop(scene: SceneState, x: number, y: number): void {
     });
   }
 }
+
+// The moment the companion gets petted — pink/gold, drifts up slower than
+// growPop, read via color the same way growPop and splash are: this file
+// doesn't draw literal heart/water shapes at this pixel scale, the
+// palette carries the meaning.
+export function heartPop(scene: SceneState, x: number, y: number): void {
+  const colors = ['rgba(240,120,150,.95)', 'rgba(255,175,150,.9)', 'rgba(255,214,140,.85)'];
+  for (let i = 0; i < 8; i++) {
+    scene.fx.push({
+      x,
+      y,
+      vx: (Math.random() - 0.5) * 0.9,
+      vy: -0.6 - Math.random() * 0.9,
+      life: 32 + Math.random() * 16,
+      c: colors[i % colors.length],
+    });
+  }
+}
+
+// The companion's ambient "alive" behavior is deliberately stateless —
+// purely a function of elapsed time t, same trick as the sway/twinkle
+// effects elsewhere in this file — except for petHappyUntil, which is the
+// one thing an interaction (not just time) needs to trigger.
+export type PetMood = 'walk' | 'sit' | 'happy';
+
+function petWander(t: number): number {
+  return Math.sin(t / 3800) * 9 + Math.sin(t / 1300 + 1.7) * 3;
+}
+
+function petIsSitting(t: number): boolean {
+  return (t / 9000) % 1 > 0.68;
+}
+
+export function petThePet(scene: SceneState, atTime: number): void {
+  scene.petHappyUntil = atTime + 1400;
+}
+
+// Generous click/tap targets for "pet the companion" — covers the sprite
+// plus its full wander range, used both for canvas hit-testing and to
+// position the keyboard-accessible equivalent button.
+export const DESKTOP_PET_HITBOX = { x: 56, y: 112, w: 42, h: 26 };
+export const MOBILE_PET_HITBOX = { x: -12, y: 246, w: 46, h: 30 };
 
 // Ported from Component.disc (line 307).
 export function disc(g: CanvasRenderingContext2D, cx: number, cy: number, r: number, col: string): void {
@@ -268,18 +311,25 @@ export function drawDesktop(p: DrawParams): void {
     }
   }
 
-  // companion
+  // companion — wanders a little, sits a lot, and gets a happier, faster
+  // tail for a moment after being petted. Position/mood are pure
+  // functions of t (plus the one interaction-triggered exception,
+  // petHappyUntil) rather than extra mutable state, same pattern as the
+  // rest of this file's ambient motion.
   if (p.companion !== 'none') {
-    const bx = 74;
+    const wander = p.ambient ? petWander(t) : 0;
+    const sitting = p.ambient ? petIsSitting(t) : true;
+    const happy = t < scene.petHappyUntil;
+    const bx = 74 + Math.round(wander);
     const by = 128;
-    const flick = Math.round(Math.sin(t / 500) * 2);
+    const flick = happy ? Math.sin(t / 220) * 3 : sitting ? Math.sin(t / 900) * 1 : Math.sin(t / 500) * 2;
     if (p.companion === 'cat') {
       g.fillStyle = lerpC('#e08b4a', '#8a6a72', d * 0.5);
       g.fillRect(bx, by, 8, 6);
       g.fillRect(bx + 6, by - 4, 5, 5);
       g.fillRect(bx + 6, by - 6, 1, 2);
       g.fillRect(bx + 9, by - 6, 1, 2);
-      g.fillRect(bx - 2, by - 2 + flick, 2, 1);
+      g.fillRect(bx - 2, by - 2 + Math.round(flick), 2, 1);
       g.fillStyle = '#3a2418';
       g.fillRect(bx + 7, by - 3, 1, 1);
       g.fillRect(bx + 10, by - 3, 1, 1);
@@ -503,18 +553,23 @@ export function drawMobile(p: MobileDrawParams): void {
     }
   }
 
-  // companion
+  // companion — see the desktop draw's companion block for the
+  // wander/mood reasoning (kept stateless, purely a function of t plus
+  // the one interaction-triggered exception, petHappyUntil).
   if (p.companion !== 'none') {
-    const bx = 6;
+    const wander = p.ambient ? petWander(t) : 0;
+    const sitting = p.ambient ? petIsSitting(t) : true;
+    const happy = t < scene.petHappyUntil;
+    const bx = 6 + Math.round(wander);
     const by = 264;
-    const flick = Math.round(Math.sin(t / 500) * 2);
+    const flick = happy ? Math.sin(t / 220) * 3 : sitting ? Math.sin(t / 900) * 1 : Math.sin(t / 500) * 2;
     if (p.companion === 'cat') {
       g.fillStyle = lerpC('#e08b4a', '#8a6a72', d * 0.5);
       g.fillRect(bx, by, 9, 7);
       g.fillRect(bx + 7, by - 5, 6, 6);
       g.fillRect(bx + 7, by - 7, 1, 2);
       g.fillRect(bx + 11, by - 7, 1, 2);
-      g.fillRect(bx - 2, by - 2 + flick, 2, 1);
+      g.fillRect(bx - 2, by - 2 + Math.round(flick), 2, 1);
       g.fillStyle = '#3a2418';
       g.fillRect(bx + 8, by - 3, 1, 1);
       g.fillRect(bx + 11, by - 3, 1, 1);

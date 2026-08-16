@@ -145,7 +145,7 @@ function App() {
             growTarget={pct / 100}
             hardWeek={hard}
             highlightBedIndex={highlightBedIndex}
-            companion="cat"
+            companion={state.companion}
             reducedMotion={reducedMotion}
             onPlotActivate={onPlotActivate}
             week={state.week}
