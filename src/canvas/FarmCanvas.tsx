@@ -3,14 +3,20 @@ import { hapticTap } from '../haptics';
 import type { Theme } from '../game/types';
 import {
   DESKTOP_GRID,
+  DESKTOP_PET_HITBOX,
   MOBILE_GRID,
+  MOBILE_PET_HITBOX,
   createSceneState,
   drawDesktop,
   drawMobile,
   growPop,
+  heartPop,
+  petThePet,
   splash,
   type Companion,
 } from './draw';
+
+const COMPANION_LABEL: Record<Companion, string> = { cat: 'cat', chicken: 'chicken', none: '' };
 
 interface FarmCanvasProps {
   isMobile: boolean;
@@ -111,10 +117,30 @@ export function FarmCanvas({
     onPlotActivate(index);
   };
 
+  const petHitbox = isMobile ? MOBILE_PET_HITBOX : DESKTOP_PET_HITBOX;
+
+  const petCompanion = () => {
+    petThePet(sceneRef.current, performance.now());
+    if (!reducedMotion) {
+      heartPop(sceneRef.current, petHitbox.x + petHitbox.w / 2, petHitbox.y + petHitbox.h / 3);
+    }
+    hapticTap();
+  };
+
   const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - r.left) / r.width) * grid.w;
     const y = ((e.clientY - r.top) / r.height) * grid.h;
+
+    if (
+      companion !== 'none' &&
+      x >= petHitbox.x && x <= petHitbox.x + petHitbox.w &&
+      y >= petHitbox.y && y <= petHitbox.y + petHitbox.h
+    ) {
+      petCompanion();
+      return;
+    }
+
     if (!reducedMotion) splash(sceneRef.current, x, y);
     const col = Math.floor((x - grid.ox) / grid.cw);
     const row = Math.floor((y - grid.oy) / grid.chh);
@@ -166,6 +192,13 @@ export function FarmCanvas({
           );
         })}
       </div>
+      {companion !== 'none' && (
+        <div role="group" aria-label="Farm companion" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          <button type="button" className="sr-only-focusable" style={{ pointerEvents: 'auto' }} onClick={petCompanion}>
+            {`Pet the ${COMPANION_LABEL[companion]}`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
