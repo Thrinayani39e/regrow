@@ -1,4 +1,4 @@
-import type { Feel, GameState } from './types';
+import type { Feel, GameState, StampKey } from './types';
 
 export type Action =
   | { type: 'SET_TARGET'; index: number }
@@ -20,6 +20,8 @@ export type Action =
   | { type: 'START_TURN' }
   | { type: 'ADVANCE_WEEK' }
   | { type: 'FINISH_TURN' }
+  | { type: 'SET_JOURNAL_STAMP'; stamp: StampKey | null }
+  | { type: 'SET_JOURNAL_NOTE'; value: string }
   | { type: 'HYDRATE'; state: GameState };
 
 // Every transition here mirrors a setState call from Component in
@@ -77,10 +79,30 @@ export function gameReducer(state: GameState, action: Action): GameState {
       return { ...state, picker: false };
     case 'START_TURN':
       return { ...state, turning: true };
-    case 'ADVANCE_WEEK':
-      return { ...state, week: Math.min(state.weeks, state.week + 1), tended: [], turning: true };
+    case 'ADVANCE_WEEK': {
+      // The journal entry (if any) belongs to the week that's ending, not
+      // the one about to start — and it's optional, so an empty draft just
+      // doesn't create an entry rather than saving a blank one.
+      const hasEntry = state.journalStamp !== null || state.journalNote.trim().length > 0;
+      const journal = hasEntry
+        ? state.journal.concat([{ week: state.week, stamp: state.journalStamp, note: state.journalNote.trim() }])
+        : state.journal;
+      return {
+        ...state,
+        week: Math.min(state.weeks, state.week + 1),
+        tended: [],
+        turning: true,
+        journal,
+        journalStamp: null,
+        journalNote: '',
+      };
+    }
     case 'FINISH_TURN':
       return { ...state, screen: 'farm', turning: false, justGrew: true };
+    case 'SET_JOURNAL_STAMP':
+      return { ...state, journalStamp: action.stamp };
+    case 'SET_JOURNAL_NOTE':
+      return { ...state, journalNote: action.value.slice(0, 140) };
     case 'HYDRATE':
       return action.state;
     default:

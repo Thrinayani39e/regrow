@@ -45,6 +45,50 @@ export function makeIcons(): Icons {
   return { can, sprout, sun };
 }
 
+export interface Stamps {
+  heart: string;
+  star: string;
+  cloud: string;
+  moon: string;
+  paw: string;
+  mug: string;
+}
+
+// Journal stamps — same px() sprite technique as the rest of the farm's
+// icons. Colors are deliberately darkened/desaturated versions of the
+// scene's fruit-red, sun-yellow, weather-blue, night-purple, cat-orange and
+// water-can-brown hues: the lighter originals measured under 2:1 contrast
+// against the tan card and amber-selected button (checked via the same
+// contrast formula used for the text palette) and all but disappeared at
+// icon size — these clear 3:1+ against both.
+export function makeStamps(): Stamps {
+  const heart = px(
+    ['........', '.##..##.', '########', '########', '.######.', '..####..', '...##...', '........'],
+    { '#': '#a83f2e' }
+  );
+  const star = px(
+    ['........', '...##...', '...##...', '.#.##.#.', '########', '.#.##.#.', '...##...', '........'],
+    { '#': '#8a5a1f' }
+  );
+  const cloud = px(
+    ['........', '..cccc..', '.cccccc.', 'cccccccc', 'cccccccc', '.r.r.r..', 'r.r.r.r.', '........'],
+    { c: '#5c6270', r: '#2f5e82' }
+  );
+  const moon = px(
+    ['........', '..####..', '.######.', '.##m###.', '########', '.######.', '..####..', '........'],
+    { '#': '#6b5a7a', m: '#4f4260' }
+  );
+  const paw = px(
+    ['........', '.#.#.#..', '.#.#.#..', '..###...', '.#####..', '.#####..', '..###...', '........'],
+    { '#': '#8a4318' }
+  );
+  const mug = px(
+    ['........', '.####...', '.#..##..', '.#...#..', '.#..##..', '.####...', '........', '........'],
+    { '#': '#7a4a1a' }
+  );
+  return { heart, star, cloud, moon, paw, mug };
+}
+
 // Ported from Component.makeThumbs (lines 259-270).
 export function makeThumbs(themes: Theme[]): string[] {
   return themes.map((th) => {
@@ -77,3 +121,4 @@ export function makeThumbs(themes: Theme[]): string[] {
 // memoize" guidance) — these are pure functions of constant data.
 export const ICONS: Icons = makeIcons();
 export const THUMBS: string[] = makeThumbs(THEMES);
+export const STAMPS: Stamps = makeStamps();

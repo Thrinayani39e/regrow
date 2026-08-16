@@ -7,6 +7,14 @@ export interface CustomChore {
   sub?: string;
 }
 
+export type StampKey = 'heart' | 'star' | 'cloud' | 'moon' | 'paw' | 'mug';
+
+export interface JournalEntry {
+  week: number;
+  stamp: StampKey | null;
+  note: string;
+}
+
 export interface GameState {
   screen: Screen;
   target: number;
@@ -24,6 +32,9 @@ export interface GameState {
   custom: CustomChore[];
   draft: string;
   picker: boolean;
+  journal: JournalEntry[];
+  journalStamp: StampKey | null;
+  journalNote: string;
 }
 
 export const initialState: GameState = {
@@ -43,6 +54,9 @@ export const initialState: GameState = {
   custom: [],
   draft: '',
   picker: false,
+  journal: [],
+  journalStamp: null,
+  journalNote: '',
 };
 
 export interface Target {
