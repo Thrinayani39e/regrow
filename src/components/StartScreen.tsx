@@ -27,6 +27,7 @@ export function StartScreen({ state, dispatch }: StartScreenProps) {
                 key={opt.n}
                 onClick={() => dispatch({ type: 'SET_TARGET', index: i })}
                 bg={i === state.target ? palette.btnAmberBg : palette.btnTanBg}
+                ariaPressed={i === state.target}
                 fontFamily={pixelFont}
                 fontSize={17}
                 padding="12px 14px"
@@ -85,6 +86,7 @@ export function StartScreen({ state, dispatch }: StartScreenProps) {
                   key={lv.n}
                   onClick={() => dispatch({ type: 'SET_START_LEVEL', value: lv.v })}
                   bg={lv.v === state.startLevel ? palette.btnAmberBg : palette.btnTanBg}
+                  ariaPressed={lv.v === state.startLevel}
                   fontFamily={pixelFont}
                   fontSize={17}
                   padding="9px 13px"
@@ -105,6 +107,7 @@ export function StartScreen({ state, dispatch }: StartScreenProps) {
                 type="button"
                 className="focus-ring"
                 onClick={() => dispatch({ type: 'SET_PLOT', index: i })}
+                aria-pressed={i === state.plot}
                 style={{
                   cursor: 'pointer',
                   fontFamily: pixelFont,
