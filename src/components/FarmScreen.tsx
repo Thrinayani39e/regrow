@@ -115,7 +115,9 @@ export function FarmScreen({ state, dispatch, chores, isMobile }: FarmScreenProp
     ? 'rain over the east beds this week. nothing to fix — the plants know what to do with a slow week.'
     : allDone
       ? "that's everything the plot needed. the rest of the day is just yours."
-      : "you don't have to do these in order. or all at once.";
+      : state.tended.length === 0
+        ? 'nothing tended yet today, and that can just be true — even checking in on the plot counts.'
+        : "you don't have to do these in order. or all at once.";
 
   if (isMobile) {
     if (!state.picker) {

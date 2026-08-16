@@ -1,6 +1,7 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { TARGETS, THEMES } from './game/data';
 import { choreList, hardWeek, hoursFor, isDusk, pctFor } from './game/derived';
+import { checkReturnAfterGap } from './game/lastSeen';
 import { palette } from './game/palette';
 import { gameReducer } from './game/reducer';
 import { loadState, saveState } from './game/storage';
@@ -14,16 +15,28 @@ import { WorldFrame } from './components/WorldFrame';
 import { LiveRegion } from './components/LiveRegion';
 import { MoodMusicBoard } from './components/MoodMusicBoard';
 import { JournalBoard } from './components/JournalBoard';
+import { WelcomeBackBanner } from './components/WelcomeBackBanner';
 import { PixelButton, pixelDisplayFont, pixelFont } from './components/ui';
 
 function App() {
   const [state, dispatch] = useReducer(gameReducer, undefined, loadState);
   const isMobile = useIsMobile();
   const reducedMotion = usePrefersReducedMotion();
+  const [showWelcomeBack, setShowWelcomeBack] = useState(false);
 
   useEffect(() => {
     saveState(state);
   }, [state]);
+
+  // Runs once on mount, independent of the reducer entirely — a farm
+  // that's been idle for days shouldn't read as "you fell behind," so the
+  // gap check lives outside GameState and only ever adds a dismissible
+  // welcome, never a penalty.
+  useEffect(() => {
+    const returnedAfterGap = checkReturnAfterGap();
+    if (returnedAfterGap && state.started) setShowWelcomeBack(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const chores = choreList(state);
   const pct = pctFor(state, state.week);
@@ -108,6 +121,8 @@ function App() {
           )}
         </div>
       </div>
+
+      {showWelcomeBack && <WelcomeBackBanner onDismiss={() => setShowWelcomeBack(false)} />}
 
       <div style={{ width: '100%', maxWidth: 880, marginBottom: 12 }}>
         <MoodMusicBoard />
