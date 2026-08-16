@@ -14,3 +14,11 @@ A phased-return planner for burnout, illness, or leave recovery, built as a smal
 npm install
 npm run dev
 ```
+
+## Build
+
+```bash
+npm run build
+```
+
+Type-checks with `tsc -b` and produces a static bundle in `dist/` via Vite — no environment variables or backend required.
