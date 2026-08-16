@@ -117,6 +117,7 @@ export function FarmCanvas({
       <canvas
         ref={canvasRef}
         onClick={handleClick}
+        aria-hidden="true"
         style={{
           display: 'block',
           width: '100%',
