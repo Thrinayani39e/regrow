@@ -104,3 +104,29 @@ export function PixelButton({
     </button>
   );
 }
+
+// Low-emphasis exit used anywhere a screen would otherwise be a dead end
+// (e.g. mid-pour or mid-feel-check on the tend screen) — same ghost style
+// the prototype used for "PUT THE CAN DOWN", reused everywhere a way back
+// to the farm needs to exist without competing with the primary action.
+export function GhostButton({ onClick, children, style }: { onClick?: () => void; children: ReactNode; style?: CSSProperties }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="focus-ring"
+      style={{
+        cursor: 'pointer',
+        fontFamily: pixelDisplayFont,
+        fontSize: 9,
+        padding: '10px 14px',
+        border: '2px solid #6b5c4a',
+        background: 'transparent',
+        color: '#bda98e',
+        ...style,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
