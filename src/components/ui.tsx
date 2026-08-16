@@ -59,6 +59,7 @@ interface PixelButtonProps {
   style?: CSSProperties;
   disabled?: boolean;
   title?: string;
+  ariaPressed?: boolean;
 }
 
 // Every button in the source prototype shares this same recipe: solid
@@ -77,6 +78,7 @@ export function PixelButton({
   style,
   disabled,
   title,
+  ariaPressed,
 }: PixelButtonProps) {
   return (
     <button
@@ -84,6 +86,7 @@ export function PixelButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
+      aria-pressed={ariaPressed}
       className="focus-ring"
       style={{
         cursor: disabled ? 'default' : 'pointer',
