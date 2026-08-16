@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { TARGETS } from '../game/data';
 import { hoursFor, pctFor } from '../game/derived';
 import { palette } from '../game/palette';
@@ -37,13 +38,52 @@ export function DayEndScreen({ state, dispatch, isMobile, totalBeds }: DayEndScr
     ? 'the season closes here. you can always start another one.'
     : `next week: about ${pctFor(state, state.week + 1)}% — ${hoursFor(state, state.week + 1)} hrs.`;
 
+  // The 900ms delay here used to be a bare setTimeout with no way to
+  // cancel it: click LET THE WEEK TURN, then GOOD MORNING right away
+  // (before the 900ms fires), then END DAY + LET THE WEEK TURN again —
+  // the first timer was still live and could fire ADVANCE_WEEK mid
+  // transition #2, silently skipping the week forward an extra time and
+  // wiping that day's tended chores while the person was looking at
+  // something else entirely.
+  //
+  // Naively canceling the timer on unmount fixes that, but overcorrects:
+  // clicking GOOD MORNING early would unmount the component, cancel the
+  // pending ADVANCE_WEEK, and the week would just never advance at all —
+  // worse than the original bug. Clicking GOOD MORNING is a request to
+  // finish the transition *now*, so if the timer hasn't fired yet, the
+  // advance is applied immediately instead of being left to a background
+  // timer; if it already fired, this is a no-op. Either way the week
+  // advances exactly once per turn, and never after the person has moved
+  // on to something else. STAY OUT A BIT (BACK_TO_FARM) is the one path
+  // that's meant to cancel the transition outright rather than complete
+  // it early — unmounting still clears the ref for that case, and the
+  // reducer's own BACK_TO_FARM resets `turning` regardless.
+  const advanceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearAdvanceTimeout = () => {
+    if (advanceTimeoutRef.current !== null) {
+      clearTimeout(advanceTimeoutRef.current);
+      advanceTimeoutRef.current = null;
+    }
+  };
+
+  useEffect(() => () => clearAdvanceTimeout(), []);
+
   const handleTurnWeek = () => {
     if (state.turning) {
+      if (advanceTimeoutRef.current !== null) {
+        clearAdvanceTimeout();
+        dispatch({ type: 'ADVANCE_WEEK' });
+      }
       dispatch({ type: 'FINISH_TURN' });
       return;
     }
+    if (advanceTimeoutRef.current !== null) return;
     dispatch({ type: 'START_TURN' });
-    setTimeout(() => dispatch({ type: 'ADVANCE_WEEK' }), 900);
+    advanceTimeoutRef.current = setTimeout(() => {
+      advanceTimeoutRef.current = null;
+      dispatch({ type: 'ADVANCE_WEEK' });
+    }, 900);
   };
 
   const journalHint = 'want to leave a stamp or a line about this week? open JOURNAL, up by the header.';
