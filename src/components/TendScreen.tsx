@@ -4,7 +4,7 @@ import { palette } from '../game/palette';
 import type { Action } from '../game/reducer';
 import type { Chore, GameState } from '../game/types';
 import { ICONS } from '../canvas/sprites';
-import { Card, PixelButton, pixelFont, pixelDisplayFont } from './ui';
+import { Card, GhostButton, PixelButton, pixelFont, pixelDisplayFont } from './ui';
 
 interface TendScreenProps {
   state: GameState;
@@ -65,14 +65,7 @@ export function TendScreen({ state, dispatch, chores, isMobile }: TendScreenProp
               <div key={i} style={{ width: 38, height: 14, border: `2px solid ${palette.cardBorder}`, background: full ? palette.dropFull : palette.dropEmpty }} />
             ))}
           </div>
-          <button
-            type="button"
-            className="focus-ring"
-            onClick={() => dispatch({ type: 'BACK_TO_FARM' })}
-            style={{ cursor: 'pointer', fontFamily: pixelDisplayFont, fontSize: 9, padding: '10px 14px', border: '2px solid #6b5c4a', background: 'transparent', color: '#bda98e' }}
-          >
-            PUT THE CAN DOWN
-          </button>
+          <GhostButton onClick={() => dispatch({ type: 'BACK_TO_FARM' })}>PUT THE CAN DOWN</GhostButton>
         </div>
       );
     }
@@ -100,6 +93,9 @@ export function TendScreen({ state, dispatch, chores, isMobile }: TendScreenProp
               </div>
             </div>
           </div>
+          <GhostButton onClick={() => dispatch({ type: 'BACK_TO_FARM' })} style={{ alignSelf: 'flex-start' }}>
+            PUT THE CAN DOWN
+          </GhostButton>
         </div>
       </Card>
     );
@@ -128,6 +124,9 @@ export function TendScreen({ state, dispatch, chores, isMobile }: TendScreenProp
         <div style={{ fontSize: isMobile ? 14 : 15, color: palette.inkMuted }}>
           {isMobile ? 'no wrong answer here. the plan bends to you.' : 'no wrong answer here. the plan bends to you, not the other way.'}
         </div>
+        <GhostButton onClick={() => dispatch({ type: 'BACK_TO_FARM' })} style={{ alignSelf: 'flex-start' }}>
+          ANSWER THIS LATER
+        </GhostButton>
       </div>
     );
 
