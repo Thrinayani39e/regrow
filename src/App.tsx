@@ -148,6 +148,7 @@ function App() {
             companion="cat"
             reducedMotion={reducedMotion}
             onPlotActivate={onPlotActivate}
+            week={state.week}
             weekBadge={weekBadge}
             loadBadge={loadBadge}
             weatherBadge={weatherBadge}

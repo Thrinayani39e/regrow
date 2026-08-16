@@ -15,6 +15,7 @@ interface WorldFrameProps {
   companion: Companion;
   reducedMotion: boolean;
   onPlotActivate: (index: number) => void;
+  week: number;
   weekBadge: string;
   loadBadge: string;
   weatherBadge: string;
@@ -46,6 +47,7 @@ export function WorldFrame({
   companion,
   reducedMotion,
   onPlotActivate,
+  week,
   weekBadge,
   loadBadge,
   weatherBadge,
@@ -62,6 +64,7 @@ export function WorldFrame({
       companion={companion}
       reducedMotion={reducedMotion}
       onPlotActivate={onPlotActivate}
+      week={week}
     />
   );
 
