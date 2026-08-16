@@ -92,3 +92,8 @@ button {
   outline: 3px solid #f2b45c;
   outline-offset: 2px;
 }
+
+.focus-ring:focus-visible {
+  outline: 3px solid #f2b45c;
+  outline-offset: 2px;
+}
