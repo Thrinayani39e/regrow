@@ -93,7 +93,7 @@ export function TendScreen({ state, dispatch, chores, isMobile }: TendScreenProp
               </div>
             </div>
           </div>
-          <GhostButton onClick={() => dispatch({ type: 'BACK_TO_FARM' })} style={{ alignSelf: 'flex-start' }}>
+          <GhostButton onClick={() => dispatch({ type: 'BACK_TO_FARM' })} tone="light" style={{ alignSelf: 'flex-start' }}>
             PUT THE CAN DOWN
           </GhostButton>
         </div>
@@ -124,7 +124,7 @@ export function TendScreen({ state, dispatch, chores, isMobile }: TendScreenProp
         <div style={{ fontSize: isMobile ? 14 : 15, color: palette.inkMuted }}>
           {isMobile ? 'no wrong answer here. the plan bends to you.' : 'no wrong answer here. the plan bends to you, not the other way.'}
         </div>
-        <GhostButton onClick={() => dispatch({ type: 'BACK_TO_FARM' })} style={{ alignSelf: 'flex-start' }}>
+        <GhostButton onClick={() => dispatch({ type: 'BACK_TO_FARM' })} tone="light" style={{ alignSelf: 'flex-start' }}>
           ANSWER THIS LATER
         </GhostButton>
       </div>

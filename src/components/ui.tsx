@@ -112,7 +112,25 @@ export function PixelButton({
 // (e.g. mid-pour or mid-feel-check on the tend screen) — same ghost style
 // the prototype used for "PUT THE CAN DOWN", reused everywhere a way back
 // to the farm needs to exist without competing with the primary action.
-export function GhostButton({ onClick, children, style }: { onClick?: () => void; children: ReactNode; style?: CSSProperties }) {
+// `tone` picks readable colors for the two backgrounds this shows up
+// against: the dark canvas overlay (mobile bottom sheets) vs. the light
+// tan card (desktop) — using the dark-on-dark colors on the tan card
+// measured 1.5:1, so this isn't just cosmetic.
+export function GhostButton({
+  onClick,
+  children,
+  tone = 'dark',
+  style,
+}: {
+  onClick?: () => void;
+  children: ReactNode;
+  tone?: 'dark' | 'light';
+  style?: CSSProperties;
+}) {
+  const colors =
+    tone === 'dark'
+      ? { border: '2px solid #6b5c4a', color: '#bda98e' }
+      : { border: `2px solid ${palette.tagBorder}`, color: palette.inkMuted };
   return (
     <button
       type="button"
@@ -123,9 +141,8 @@ export function GhostButton({ onClick, children, style }: { onClick?: () => void
         fontFamily: pixelDisplayFont,
         fontSize: 9,
         padding: '10px 14px',
-        border: '2px solid #6b5c4a',
         background: 'transparent',
-        color: '#bda98e',
+        ...colors,
         ...style,
       }}
     >
